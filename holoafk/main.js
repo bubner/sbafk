@@ -281,11 +281,11 @@ register("chat", (e) => {
     // Get the latest message from the chat
     const message = ChatLib.removeFormatting(
         ChatLib.getChatMessage(e, true)
-    ).toLowerCase();
+    );
 
     // Check if the message contains any flagged phrases from flaggedMsgs, then attempt to run an automatic recovery sequence
     for (let i = 0; i < flaggedMsgs.length; i++) {
-        if (message.includes(flaggedMsgs[i])) {
+        if (message.toLowerCase().includes(flaggedMsgs[i])) {
             recoveryFunctions[i](message);
             break;
         }
