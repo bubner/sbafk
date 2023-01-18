@@ -37,6 +37,22 @@ class Settings {
         placeholder: 'Paste Discord user id here',
     })
     discordid = "";
+
+    @TextProperty({
+        name: "Bot Identifier",
+        description: "Will be appended to the webhook name to differentiate between accounts. Example: holoafk for <your bot identifier>",
+        category: "Discord",
+        placeholder: 'holoafk for <your bot identifier>',
+    })
+    botidentifier = "";
+
+    @TextProperty({
+        name: "Max Tries",
+        description: "Maximum number of tries to attempt to reconnect to the SkyBlock island",
+        category: "Automation",
+        placeholder: 'A number of tries to attempt',
+    })
+    maxtries = 2;
 }
 
 export default new Settings;
