@@ -1,6 +1,6 @@
-import { @Vigilant, @SwitchProperty, @ButtonProperty, @TextProperty, @ColorProperty, Color } from "../Vigilance/index.js";
+import { @Vigilant, @SwitchProperty, @TextProperty } from "../Vigilance/index.js";
 
-@Vigilant("DiscordNotifier", "§6§lDiscordNotifier", {
+@Vigilant("holoafk", "§4§lholoafk", {
     getCategoryComparator: () => (a, b) => {
         const categories = ["Global", "Automation", "Discord"];
         return categories.indexOf(a.name) - categories.indexOf(b.name);
@@ -10,9 +10,9 @@ import { @Vigilant, @SwitchProperty, @ButtonProperty, @TextProperty, @ColorPrope
 class Settings {
     constructor() {
         this.initialize(this);
-        this.setCategoryDescription("Global", "&holoafk &7- by &cholo911");
-        this.setCategoryDescription("Automation", "&holoafk &7- by &cholo911");
-        this.setCategoryDescription("Discord", "&holoafk &7- by &cholo911");
+        this.setCategoryDescription("Global", "&4holoafk &7- by &cholo911");
+        this.setCategoryDescription("Automation", "&4holoafk &7- by &cholo911");
+        this.setCategoryDescription("Discord", "&4holoafk &7- by &cholo911");
     }
 
     @SwitchProperty({
@@ -50,9 +50,9 @@ class Settings {
         name: "Max Tries",
         description: "Maximum number of tries to attempt to reconnect to the SkyBlock island",
         category: "Automation",
-        placeholder: 'A number of tries to attempt',
+        placeholder: 'A number of tries to attempt. Defaults to 2.',
     })
-    maxtries = 2;
+    maxtries = "";
 }
 
 export default new Settings;

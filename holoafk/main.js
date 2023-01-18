@@ -6,7 +6,7 @@
  * @author Lucas Bubner, 2023
  */
 
-import Settings from "./config";
+import Settings from "./config.js";
 import request from "requestv2/index";
 
 // Register /holo to the settings configuration command
@@ -20,14 +20,14 @@ register("command", () => {
  */
 function sendMsg(message) {
     setTimeout(() => {
-        ChatLib.chat(`&4[&choloafk&4]&c ${message}`);
+        ChatLib.chat(`&4[&choloafk&4]&7 ${message}`);
     }, 100);
 }
 
 /**
  * Internal function to check if settings are valid before sending a request to the Discord webhook.
  */
-function checkSettings() {
+function checkSettings(msg) {
     if (!Settings.webhookurl.includes("discord.com/api/webhooks/")) {
         sendMsg("Invalid Discord webhook URL provided!");
         return false;
@@ -44,9 +44,7 @@ function checkSettings() {
  * Internal function to check if a user is in SkyBlock or not.
  */
 function isInSkyBlock() {
-    return !ChatLib.removeFormatting(Scoreboard.getTitle()).includes(
-        "SKYBLOCK"
-    );
+    return ChatLib.removeFormatting(Scoreboard.getTitle()).includes("SKYBLOCK");
 }
 
 /**
@@ -54,7 +52,7 @@ function isInSkyBlock() {
  * @param {string} msg Message to be relayed to the Discord webhook.
  */
 function sendToDiscordHigh(msg, content) {
-    if (!checkSettings()) return;
+    if (!checkSettings(msg)) return;
 
     let pingmsg;
     if (Settings.discordid == "@everyone" || Settings.discordid == "@here") {
@@ -63,11 +61,7 @@ function sendToDiscordHigh(msg, content) {
         pingmsg = Settings.discordid ? `<@${Settings.discordid}>` : "";
     }
 
-    const fullmsg =
-        content +
-        "\n\nTriggered by message:\n" +
-        msg +
-        `\n<t:${Math.floor(Date.now() / 1000)}:R>`;
+    const fullmsg = content + "\n\nTriggered by message:\n" + msg + `\n<t:${Math.floor(Date.now() / 1000)}:R>`;
 
     request({
         url: Settings.webhookurl,
@@ -77,11 +71,8 @@ function sendToDiscordHigh(msg, content) {
             "User-Agent": "Mozilla/5.0",
         },
         body: {
-            username: Settings.botidentifier
-                ? `holoafk notifier for ${Settings.botidentifier}`
-                : "holoafk notifier",
-            avatar_url:
-                "https://cdn.discordapp.com/attachments/792907086555643904/1061517437708816444/holov2simple.png",
+            username: Settings.botidentifier ? `holoafk notifier for ${Settings.botidentifier}` : "holoafk notifier",
+            avatar_url: "https://cdn.discordapp.com/attachments/792907086555643904/1061517437708816444/holov2simple.png",
             content: pingmsg,
             embeds: [
                 {
@@ -97,12 +88,9 @@ function sendToDiscordHigh(msg, content) {
         },
     }).catch((err) => {
         setTimeout(() => {
-            // Catch any errors that might happen with the webhook, and retry the function again.
-            // Must wait a minimum of 10 seconds before retrying.
-            sendMsg(
-                "An error occurred while trying to send a high priority message through the Discord webhook. Retrying in 10 seconds...",
-                err
-            );
+            // Catch any errors that might happen with the webhook, and retry the function again,
+            // but after a 10 second delay.
+            sendMsg("An error occurred while trying to send a high priority message through the Discord webhook. Retrying in 10 seconds...", err);
             sendToDiscordHigh(msg, content);
         }, 10000);
     });
@@ -113,13 +101,9 @@ function sendToDiscordHigh(msg, content) {
  * @param {string} msg Message to be relayed to the Discord webhook.
  */
 function sendToDiscordLow(msg, content) {
-    if (!checkSettings()) return;
+    if (!checkSettings(msg)) return;
 
-    const fullmsg =
-        content +
-        "\n\nTriggered by message:\n" +
-        msg +
-        `\n<t:${Math.floor(Date.now() / 1000)}:R>`;
+    const fullmsg = content + "\n\nTriggered by message:\n" + msg + `\n<t:${Math.floor(Date.now() / 1000)}:R>`;
 
     request({
         url: Settings.webhookurl,
@@ -129,11 +113,8 @@ function sendToDiscordLow(msg, content) {
             "User-Agent": "Mozilla/5.0",
         },
         body: {
-            username: Settings.botidentifier
-                ? `holoafk notifier for ${Settings.botidentifier}`
-                : "holoafk notifier",
-            avatar_url:
-                "https://cdn.discordapp.com/attachments/792907086555643904/1061517437708816444/holov2simple.png",
+            username: Settings.botidentifier ? `holoafk notifier for ${Settings.botidentifier}` : "holoafk notifier",
+            avatar_url: "https://cdn.discordapp.com/attachments/792907086555643904/1061517437708816444/holov2simple.png",
             content: "",
             embeds: [
                 {
@@ -151,10 +132,7 @@ function sendToDiscordLow(msg, content) {
         setTimeout(() => {
             // Catch any errors that might happen with the webhook, and retry the function again.
             // Must wait a minimum of 20 seconds before retrying.
-            sendMsg(
-                "An error occurred while trying to send a low priority message through the Discord webhook. Retrying in 20 seconds...",
-                err
-            );
+            sendMsg("An error occurred while trying to send a low priority message through the Discord webhook. Retrying in 20 seconds...", err);
             sendToDiscordLow(msg, content);
         }, 20000);
     });
@@ -163,68 +141,74 @@ function sendToDiscordLow(msg, content) {
 /**
  * Attempt to recover the connection to the SkyBlock island from the Prototype or Main Lobby.
  */
-async function attemptLobbyRecovery(m) {
-    let maxTries = Settings.maxtries ? Settings.maxtries : 2;
+function attemptLobbyRecovery(m) {
+    let maxTries = Settings.maxtries ? parseInt(Settings.maxtries) : 2;
     let currentTry = 0;
+    
+    setTimeout(() => {
+        function tryJoinSkyBlock(callback) {
+            if (!isInSkyBlock() && currentTry < maxTries) {
+                // Send command to join SkyBlock
+                setTimeout(() => {
+                    ChatLib.say("/play sb");
+                }, 200);
+                currentTry++;
+        
+                // Wait 5 seconds before trying again
+                setTimeout(() => tryJoinSkyBlock(callback), 5000);
+            } else {
+                callback();
+            }
+        }
+        tryJoinSkyBlock(() => {
+            if (currentTry === maxTries && !isInSkyBlock()) {
+                // Max automatic attempts were made. Alert user that recovery was unsuccessful.
+                sendToDiscordHigh(m, "User was kicked from the island, and automatic recovery was unsuccessful. Please check your account.");
+                return;
+            }
 
-    while (!isInSkyBlock() && currentTry <= maxTries) {
-        // Wait a bit before running any commands or retries
-        await new Promise((resolve) => setTimeout(resolve, 3000));
-        // Send command to join skyblock
-        ChatLib.say("/play sb");
-        currentTry++;
-    }
-
-    if (currentTry === maxTries && !isInSkyBlock()) {
-        // Max automatic attempts were made. Alert user that recovery was unsuccessful.
-        sendToDiscordHigh(
-            m,
-            "User was kicked from the island, and automatic recovery was unsuccessful. Please check your account."
-        );
-        return;
-    }
-
-    // Notify user recovery was successful and no further action is required
-    sendToDiscordLow(
-        m,
-        "User was kicked from the island, but automatic recovery was successful. No actions required."
-    );
+            // Notify user recovery was successful and no further action is required
+            if (isInSkyBlock())
+                sendToDiscordLow(m, "User was kicked from the island, but automatic recovery was successful. No actions required.");
+        });
+    }, 2000);
 }
 
 /**
  * Attempt to recover the connection to the SkyBlock island from the SkyBlock Lobby.
  */
-async function attemptHubRecovery(m) {
+function attemptHubRecovery(m) {
     let connected = false;
-    // Wait a bit before trying to recover the user connection.
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    let i = 0;
 
     // Make a listener for world loading to detect if we have connected back to the island
     register("worldLoad", () => {
         connected = true;
     });
 
-    for (let i = 0; i < Settings.maxtries ? Settings.maxtries : 2 && !connected; i++) {
-        // Rejoin island from the hub
-        ChatLib.say("/is");
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-    }
+    function tryRecover() {
+        if (i < (Settings.maxtries ? parseInt(Settings.maxtries) : 2) && !connected) {
+            // Rejoin island from the hub
+            ChatLib.say("/is");
+            i++;
 
-    if (!connected) {
-        // If we're still connected to the hub, alert through Discord that automatic recovery was unsuccessful
-        sendToDiscordHigh(
-            m,
-            "User was kicked to the hub, and automatic recovery was unsuccessful. Please check your account."
-        );
-        return;
-    }
+            // Wait 5 seconds before trying again
+            setTimeout(tryRecover, 5000);
+        } else {
+            if (!connected) {
+                // If we're still connected to the hub, alert through Discord that automatic recovery was unsuccessful
+                sendToDiscordHigh(m, "User was spawned into the hub, and automatic recovery was unsuccessful. Please check your account.");
+                return;
+            }
 
-    // Connection established to the Private Island again.
-    sendToDiscordLow(
-        m,
-        "User was kicked to the hub, but automatic recovery was successful. No actions required."
-    );
+            // Connection established to the Private Island again.
+            sendToDiscordLow(m, "User was spawned into the hub, but automatic recovery was successful. No actions required.");
+        }
+    }
+    // Wait 2 seconds before trying recovery
+    setTimeout(tryRecover, 2000);
 }
+
 
 /**
  * Attempt to recover the connection to the SkyBlock island from Limbo.
@@ -236,21 +220,33 @@ function attemptLimboRecovery(m) {
         attemptLobbyRecovery(m);
     }, 2000);
 
-    ChatLib.say("/l");
+    setTimeout(() => {
+        ChatLib.say("/l");
+    }, 400);
 }
+
+let alreadycalled = false;
+
+/**
+ * Secondary listener to recover the worldUnload listener and allow it to fire again
+ */
+register("worldLoad", () => {
+    alreadycalled = false;
+});
 
 /**
  * Primary listener for server/world disconnects, where the plugin will not be able to reconnect the user.
  */
 register("worldUnload", () => {
-    // Don't do anything if the module is not active
-    if (!Settings.toggle) return;
+    // Don't do anything if the module is not active, or if the call has already been sent
+    if (!Settings.toggle || alreadycalled) return;
 
     // Get the current IP of the user. If it is blank, we are not connected to a server,
     // but if it is present, we have simply switched servers.
+    alreadycalled = true;
     setTimeout(() => {
         if (Server.getIP() == "")
-            sendToDiscordHigh(null, "User has lost connection to the server and cannot be recovered automatically. Please check your account."); 
+            sendToDiscordHigh("<account disconnect detection>", "User has lost connection to the server and cannot be recovered automatically. Please check your account.");
     }, 2000);
 });
 
@@ -267,6 +263,8 @@ register("chat", (e) => {
         attemptHubRecovery,
         attemptLobbyRecovery,
         attemptLobbyRecovery,
+        attemptLobbyRecovery,
+        attemptLimboRecovery,
         attemptLimboRecovery,
     ];
 
@@ -275,7 +273,9 @@ register("chat", (e) => {
         "you are being transferred",
         "an exception occurred in your connection",
         "a disconnect occurred in your connection",
+        "a kick occurred in your connection",
         "you are afk",
+        "you were spawned in limbo",
     ];
 
     // Get the latest message from the chat
