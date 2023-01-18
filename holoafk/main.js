@@ -154,8 +154,8 @@ function attemptLobbyRecovery(m) {
                 }, 200);
                 currentTry++;
         
-                // Wait 5 seconds before trying again
-                setTimeout(() => tryJoinSkyBlock(callback), 5000);
+                // Wait 10 seconds before trying again
+                setTimeout(() => tryJoinSkyBlock(callback), 10000);
             } else {
                 callback();
             }
