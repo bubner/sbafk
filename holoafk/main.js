@@ -80,7 +80,7 @@ function sendToDiscordHigh(msg, content) {
                     color: 0xed1c24,
                     description: fullmsg,
                     footer: {
-                        text: "Created by holo911, mitigating Australian internet one step a time.",
+                        text: "Module created by holo#0911; https://github.com/holo-lb/holoafk",
                     },
                     fields: [],
                 },
@@ -122,7 +122,7 @@ function sendToDiscordLow(msg, content) {
                     color: 0x00b020,
                     description: fullmsg,
                     footer: {
-                        text: "Created by holo911, mitigating Australian internet one step a time.",
+                        text: "Module created by holo#0911; https://github.com/holo-lb/holoafk",
                     },
                     fields: [],
                 },
@@ -188,6 +188,9 @@ function attemptHubRecovery(m) {
 
     function tryRecover() {
         if (i < (Settings.maxtries ? parseInt(Settings.maxtries) : 2) && !connected) {
+            // Reset connected state
+            connected = false;
+
             // Rejoin island from the hub
             ChatLib.say("/is");
             i++;
