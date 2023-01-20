@@ -48,6 +48,13 @@ function isInSkyBlock() {
 }
 
 /**
+ * Internal function to check if a user is on the Private Island.
+ */
+function isOnPrivateIsland() {
+    return ChatLib.removeFormatting(Scoreboard.getLineByIndex(4)).includes("Your Island");
+}
+
+/**
  * Sends a pinging message to the Discord webhook, used for server disconnect and irrecoverable states.
  * @param {string} msg Message to be relayed to the Discord webhook.
  */
@@ -169,7 +176,12 @@ function attemptLobbyRecovery(m) {
 
             // Notify user recovery was successful and no further action is required
             if (isInSkyBlock())
-                sendToDiscordLow(m, "User was kicked from the island, but automatic recovery was successful. No actions required.");
+                // Make sure we haven't just connected to the hub
+                if (!isOnPrivateIsland()) {
+                    attemptHubRecovery(m)
+                } else {
+                    sendToDiscordLow(m, "User was kicked from the island, but automatic recovery was successful. No actions required.");
+                }
         });
     }, 2000);
 }
@@ -178,19 +190,10 @@ function attemptLobbyRecovery(m) {
  * Attempt to recover the connection to the SkyBlock island from the SkyBlock Lobby.
  */
 function attemptHubRecovery(m) {
-    let connected = false;
     let i = 0;
 
-    // Make a listener for world loading to detect if we have connected back to the island
-    register("worldLoad", () => {
-        connected = true;
-    });
-
     function tryRecover() {
-        if (i < (Settings.maxtries ? parseInt(Settings.maxtries) : 2) && !connected) {
-            // Reset connected state
-            connected = false;
-
+        if (i < (Settings.maxtries ? parseInt(Settings.maxtries) : 2) && !isOnPrivateIsland()) {
             // Rejoin island from the hub
             ChatLib.say("/is");
             i++;
@@ -198,7 +201,7 @@ function attemptHubRecovery(m) {
             // Wait 5 seconds before trying again
             setTimeout(tryRecover, 5000);
         } else {
-            if (!connected) {
+            if (!isOnPrivateIsland()) {
                 // If we're still connected to the hub, alert through Discord that automatic recovery was unsuccessful
                 sendToDiscordHigh(m, "User was spawned into the hub, and automatic recovery was unsuccessful. Please check your account.");
                 return;
