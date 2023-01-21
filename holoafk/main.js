@@ -34,8 +34,7 @@ function checkSettings(msg) {
     }
 
     let internalMsg = `Sending Discord notification from triggering message: "${msg}"`;
-    if (!Settings.discordid)
-        internalMsg += ", but no Discord ID to ping was specified.";
+    if (!Settings.discordid) internalMsg += ", but no Discord ID to ping was specified.";
     sendMsg(internalMsg);
     return true;
 }
@@ -51,7 +50,11 @@ function isInSkyBlock() {
  * Internal function to check if a user is on the Private Island.
  */
 function isOnPrivateIsland() {
-    return ChatLib.removeFormatting(Scoreboard.getLineByIndex(4)).includes("Your Island");
+    // For some god forbidden reason, Hypixel includes emojis in their scoreboard island location depending on the island type.
+    // This is why we are looking for a lollipop, as it is actually in the scoreboard but Minecraft is unable to display them.
+    // To ensure this continues to work, there's also a fallback solution incase they remove these strange island indicators.
+    const location = ChatLib.removeFormatting(Scoreboard.getLineByIndex(Scoreboard.getLines().length - 5));
+    return location.includes("🍭") || location.includes("Your Isla"); // Lollipop location is just after the 'a' in Island
 }
 
 /**
@@ -79,7 +82,8 @@ function sendToDiscordHigh(msg, content) {
         },
         body: {
             username: Settings.botidentifier ? `holoafk notifier for ${Settings.botidentifier}` : "holoafk notifier",
-            avatar_url: "https://cdn.discordapp.com/attachments/792907086555643904/1061517437708816444/holov2simple.png",
+            avatar_url:
+                "https://cdn.discordapp.com/attachments/792907086555643904/1061517437708816444/holov2simple.png",
             content: pingmsg,
             embeds: [
                 {
@@ -97,7 +101,10 @@ function sendToDiscordHigh(msg, content) {
         setTimeout(() => {
             // Catch any errors that might happen with the webhook, and retry the function again,
             // but after a 10 second delay.
-            sendMsg("An error occurred while trying to send a high priority message through the Discord webhook. Retrying in 10 seconds...", err);
+            sendMsg(
+                "An error occurred while trying to send a high priority message through the Discord webhook. Retrying in 10 seconds...",
+                err
+            );
             sendToDiscordHigh(msg, content);
         }, 10000);
     });
@@ -121,7 +128,8 @@ function sendToDiscordLow(msg, content) {
         },
         body: {
             username: Settings.botidentifier ? `holoafk notifier for ${Settings.botidentifier}` : "holoafk notifier",
-            avatar_url: "https://cdn.discordapp.com/attachments/792907086555643904/1061517437708816444/holov2simple.png",
+            avatar_url:
+                "https://cdn.discordapp.com/attachments/792907086555643904/1061517437708816444/holov2simple.png",
             content: "",
             embeds: [
                 {
@@ -139,7 +147,10 @@ function sendToDiscordLow(msg, content) {
         setTimeout(() => {
             // Catch any errors that might happen with the webhook, and retry the function again.
             // Must wait a minimum of 20 seconds before retrying.
-            sendMsg("An error occurred while trying to send a low priority message through the Discord webhook. Retrying in 20 seconds...", err);
+            sendMsg(
+                "An error occurred while trying to send a low priority message through the Discord webhook. Retrying in 20 seconds...",
+                err
+            );
             sendToDiscordLow(msg, content);
         }, 20000);
     });
@@ -151,7 +162,7 @@ function sendToDiscordLow(msg, content) {
 function attemptLobbyRecovery(m) {
     let maxTries = Settings.maxtries ? parseInt(Settings.maxtries) : 2;
     let currentTry = 0;
-    
+
     setTimeout(() => {
         function tryJoinSkyBlock(callback) {
             if (!isInSkyBlock() && currentTry < maxTries) {
@@ -160,7 +171,7 @@ function attemptLobbyRecovery(m) {
                     ChatLib.say("/play sb");
                 }, 200);
                 currentTry++;
-        
+
                 // Wait 10 seconds before trying again
                 setTimeout(() => tryJoinSkyBlock(callback), 10000);
             } else {
@@ -170,17 +181,23 @@ function attemptLobbyRecovery(m) {
         tryJoinSkyBlock(() => {
             if (currentTry === maxTries && !isInSkyBlock()) {
                 // Max automatic attempts were made. Alert user that recovery was unsuccessful.
-                sendToDiscordHigh(m, "User was kicked from the island, and automatic recovery was unsuccessful. Please check your account.");
+                sendToDiscordHigh(
+                    m,
+                    "User was kicked from the island, and automatic recovery was unsuccessful. Please check your account."
+                );
                 return;
             }
 
             // Notify user recovery was successful and no further action is required
             if (isInSkyBlock())
-                // Make sure we haven't just connected to the hub
                 if (!isOnPrivateIsland()) {
-                    attemptHubRecovery(m)
+                    // Make sure we haven't just connected to the hub
+                    attemptHubRecovery(m);
                 } else {
-                    sendToDiscordLow(m, "User was kicked from the island, but automatic recovery was successful. No actions required.");
+                    sendToDiscordLow(
+                        m,
+                        "User was kicked from the island, but automatic recovery was successful. No actions required."
+                    );
                 }
         });
     }, 2000);
@@ -203,18 +220,23 @@ function attemptHubRecovery(m) {
         } else {
             if (!isOnPrivateIsland()) {
                 // If we're still connected to the hub, alert through Discord that automatic recovery was unsuccessful
-                sendToDiscordHigh(m, "User was spawned into the hub, and automatic recovery was unsuccessful. Please check your account.");
+                sendToDiscordHigh(
+                    m,
+                    "User was spawned into the hub, and automatic recovery was unsuccessful. Please check your account."
+                );
                 return;
             }
 
             // Connection established to the Private Island again.
-            sendToDiscordLow(m, "User was spawned into the hub, but automatic recovery was successful. No actions required.");
+            sendToDiscordLow(
+                m,
+                "User was spawned into the hub, but automatic recovery was successful. No actions required."
+            );
         }
     }
     // Wait 2 seconds before trying recovery
     setTimeout(tryRecover, 2000);
 }
-
 
 /**
  * Attempt to recover the connection to the SkyBlock island from Limbo.
@@ -252,7 +274,10 @@ register("worldUnload", () => {
     alreadycalled = true;
     setTimeout(() => {
         if (Server.getIP() == "")
-            sendToDiscordHigh("<account disconnect detection>", "User has lost connection to the server and cannot be recovered automatically. Please check your account.");
+            sendToDiscordHigh(
+                "<account disconnect detection>",
+                "User has lost connection to the server and cannot be recovered automatically. Please check your account."
+            );
     }, 2000);
 });
 
@@ -285,9 +310,7 @@ register("chat", (e) => {
     ];
 
     // Get the latest message from the chat
-    const message = ChatLib.removeFormatting(
-        ChatLib.getChatMessage(e, true)
-    );
+    const message = ChatLib.removeFormatting(ChatLib.getChatMessage(e, true));
 
     // Check if the message contains any flagged phrases from flaggedMsgs, then attempt to run an automatic recovery sequence
     for (let i = 0; i < flaggedMsgs.length; i++) {
