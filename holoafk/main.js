@@ -315,7 +315,10 @@ register("chat", (e) => {
     // Check if the message contains any flagged phrases from flaggedMsgs, then attempt to run an automatic recovery sequence
     for (let i = 0; i < flaggedMsgs.length; i++) {
         if (message.toLowerCase().includes(flaggedMsgs[i])) {
-            recoveryFunctions[i](message);
+            // Wait 5 seconds before attempting any recovery sequences
+            setTimeout(() => {
+                recoveryFunctions[i](message);
+            }, 5000);
             break;
         }
     }
