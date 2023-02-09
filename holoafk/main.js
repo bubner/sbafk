@@ -53,8 +53,8 @@ function isOnPrivateIsland() {
     // For some god forbidden reason, Hypixel includes emojis in their scoreboard island location depending on the island type.
     // This is why we are looking for a lollipop, as it is actually in the scoreboard but Minecraft is unable to display them.
     // To ensure this continues to work, there's also a fallback solution incase they remove these strange island indicators.
-    const location = ChatLib.removeFormatting(Scoreboard.getLineByIndex(Scoreboard.getLines().length - 5));
-    return location.includes("🍭") || location.includes("Your Isla"); // Lollipop location is just after the 'a' in Island
+    const lines = ChatLib.removeFormatting(Scoreboard.getLines());
+    return lines.some((line) => line.includes("🍭") || line.includes("Your Isla"));
 }
 
 /**
