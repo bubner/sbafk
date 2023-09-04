@@ -5,5 +5,5 @@
     "helpMessage": "Settings: /holo",
     "version": "1.0.0",
     "entry": "main.js",
-    "requires": ["Vigilance", "requestV2"]
+    "requires": ["Vigilance", "axios"]
 }

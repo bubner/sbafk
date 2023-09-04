@@ -7,7 +7,7 @@
  */
 
 import Settings from "./config.js";
-import request from "requestv2/index";
+import { request } from "axios";
 
 // Register /holo to the settings configuration command
 register("command", () => {
@@ -137,7 +137,7 @@ function sendToDiscordLow(msg, content) {
                     color: 0x00b020,
                     description: fullmsg,
                     footer: {
-                        text: "Module created by holo#0911; https://github.com/holo-lb/holoafk",
+                        text: "https://github.com/hololb/holoafk",
                     },
                     fields: [],
                 },
