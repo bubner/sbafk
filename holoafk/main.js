@@ -137,7 +137,7 @@ function sendToDiscordLow(msg, content) {
                     color: 0x00b020,
                     description: fullmsg,
                     footer: {
-                        text: "https://github.com/hololb/holoafk",
+                        text: "https://github.com/bubner/holoafk",
                     },
                     fields: [],
                 },
