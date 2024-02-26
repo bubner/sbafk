@@ -10,9 +10,9 @@ import { @Vigilant, @SwitchProperty, @TextProperty } from "../Vigilance/index.js
 class Settings {
     constructor() {
         this.initialize(this);
-        this.setCategoryDescription("Global", "&4holoafk &7- by &cholo911");
-        this.setCategoryDescription("Automation", "&4holoafk &7- by &cholo911");
-        this.setCategoryDescription("Discord", "&4holoafk &7- by &cholo911");
+        this.setCategoryDescription("Global", "&4holoafk &7- by &cholo");
+        this.setCategoryDescription("Automation", "&4holoafk &7- by &cholo");
+        this.setCategoryDescription("Discord", "&4holoafk &7- by &cholo");
     }
 
     @SwitchProperty({
