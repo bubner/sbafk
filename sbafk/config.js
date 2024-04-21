@@ -1,6 +1,6 @@
 import { @Vigilant, @SwitchProperty, @TextProperty } from "../Vigilance/index.js";
 
-@Vigilant("holoafk", "§4§lholoafk", {
+@Vigilant("sbafk", "§4§lsbafk", {
     getCategoryComparator: () => (a, b) => {
         const categories = ["Global", "Automation", "Discord"];
         return categories.indexOf(a.name) - categories.indexOf(b.name);
@@ -10,9 +10,9 @@ import { @Vigilant, @SwitchProperty, @TextProperty } from "../Vigilance/index.js
 class Settings {
     constructor() {
         this.initialize(this);
-        this.setCategoryDescription("Global", "&4holoafk &7- by &cholo");
-        this.setCategoryDescription("Automation", "&4holoafk &7- by &cholo");
-        this.setCategoryDescription("Discord", "&4holoafk &7- by &cholo");
+        this.setCategoryDescription("Global", "&4sbafk &7auto notifier");
+        this.setCategoryDescription("Automation", "&4sbafk &7auto notifier");
+        this.setCategoryDescription("Discord", "&4sbafk &7auto notifier");
     }
 
     @SwitchProperty({
@@ -40,9 +40,9 @@ class Settings {
 
     @TextProperty({
         name: "Bot Identifier",
-        description: "Will be appended to the webhook name to differentiate between accounts. Example: holoafk for <your bot identifier>",
+        description: "Will be appended to the webhook name to differentiate between accounts. Example: sbafk for <your bot identifier>",
         category: "Discord",
-        placeholder: 'holoafk for <your bot identifier>',
+        placeholder: 'sbafk for <your bot identifier>',
     })
     botidentifier = "";
 

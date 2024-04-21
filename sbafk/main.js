@@ -2,25 +2,25 @@
 /// <reference lib="es2015" />
 
 /**
- * holoafk ChatTriggers module
+ * sbafk ChatTriggers module
  * @author Lucas Bubner, 2023
  */
 
 import Settings from "./config.js";
 import { request } from "axios";
 
-// Register /holo to the settings configuration command
+// Register /sbafk to the settings configuration command
 register("command", () => {
     Settings.openGUI();
-}).setName("holo");
+}).setName("sbafk");
 
 /**
  * Utility function to send a message through the plugin to the user's ingame chat.
- * @param {string} message Message to send to the user, [holoafk] prefix will be added automatically.
+ * @param {string} message Message to send to the user, [sbafk] prefix will be added automatically.
  */
 function sendMsg(message) {
     setTimeout(() => {
-        ChatLib.chat(`&4[&choloafk&4]&7 ${message}`);
+        ChatLib.chat(`&4[&csbafk&4]&7 ${message}`);
     }, 100);
 }
 
@@ -81,7 +81,7 @@ function sendToDiscordHigh(msg, content) {
             "User-Agent": "Mozilla/5.0",
         },
         body: {
-            username: Settings.botidentifier ? `holoafk notifier for ${Settings.botidentifier}` : "holoafk notifier",
+            username: Settings.botidentifier ? `sbafk notifier for ${Settings.botidentifier}` : "sbafk notifier",
             avatar_url:
                 "https://cdn.discordapp.com/attachments/792907086555643904/1061517437708816444/holov2simple.png",
             content: pingmsg,
@@ -91,7 +91,7 @@ function sendToDiscordHigh(msg, content) {
                     color: 0xed1c24,
                     description: fullmsg,
                     footer: {
-                        text: "Module created by holo#0911; https://github.com/holo-lb/holoafk",
+                        text: "https://github.com/bubner/sbafk",
                     },
                     fields: [],
                 },
@@ -127,7 +127,7 @@ function sendToDiscordLow(msg, content) {
             "User-Agent": "Mozilla/5.0",
         },
         body: {
-            username: Settings.botidentifier ? `holoafk notifier for ${Settings.botidentifier}` : "holoafk notifier",
+            username: Settings.botidentifier ? `sbafk notifier for ${Settings.botidentifier}` : "sbafk notifier",
             avatar_url:
                 "https://cdn.discordapp.com/attachments/792907086555643904/1061517437708816444/holov2simple.png",
             content: "",
@@ -137,7 +137,7 @@ function sendToDiscordLow(msg, content) {
                     color: 0x00b020,
                     description: fullmsg,
                     footer: {
-                        text: "https://github.com/bubner/holoafk",
+                        text: "https://github.com/bubner/sbafk",
                     },
                     fields: [],
                 },

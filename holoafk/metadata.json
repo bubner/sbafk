@@ -1,9 +1,0 @@
-{
-    "name": "holoafk",
-    "creator": "&c&dholo",
-    "description": "Custom ChatTriggers module to assist in Hypixel SkyBlock AFKing. Settings: /holo",
-    "helpMessage": "Settings: /holo",
-    "version": "1.0.0",
-    "entry": "main.js",
-    "requires": ["Vigilance", "axios"]
-}

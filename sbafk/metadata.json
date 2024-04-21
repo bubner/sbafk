@@ -1,0 +1,9 @@
+{
+    "name": "sbafk",
+    "creator": "bubner",
+    "description": "Custom ChatTriggers module to assist in Hypixel SkyBlock AFKing. Settings: /sbafk",
+    "helpMessage": "Settings: /sbafk",
+    "version": "1.0.0",
+    "entry": "main.js",
+    "requires": ["Vigilance", "axios"]
+}
